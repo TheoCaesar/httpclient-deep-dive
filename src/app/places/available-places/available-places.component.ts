@@ -18,8 +18,10 @@ export class AvailablePlacesComponent implements OnInit {
   httpClient = inject(HttpClient)
   destroyRef = inject(DestroyRef)
   // constructor(private httpClient: HttpClient){}
+  isLoading = signal<boolean | undefined>(undefined);
 
   ngOnInit() {
+    this.isLoading.set(true)
     const getPlaces = this.httpClient.
       get<{places: Place[]}>('http://localhost:3000/places', {
         observe:'response' //or events as a value;
@@ -31,6 +33,7 @@ export class AvailablePlacesComponent implements OnInit {
           this.places.set(response)
         },
         error: (err) => console.log('Eror', err),
+        complete: ()=> this.isLoading.update((loading)=> loading = false)
     })
 
     this.destroyRef.onDestroy(() => getPlaces.unsubscribe())
