@@ -19,10 +19,11 @@ export class AvailablePlacesComponent implements OnInit {
   // constructor(private httpClient: HttpClient){}
 
   ngOnInit() {
-    const getPlaces = this.httpClient.get('http://localhost:3000/places').subscribe({
-      next:(data)=> console.log(data),
-      error: (err) => console.log('Eror', err),
-      complete: ()=> console.log('Completed...')
+    const getPlaces = this.httpClient.
+      get<{places: Place[]}>('http://localhost:3000/places').subscribe({
+        next:(data)=> console.log(data.places),
+        error: (err) => console.log('Eror', err),
+        complete: ()=> console.log('Completed...')
     })
 
     this.destroyRef.onDestroy(() => getPlaces.unsubscribe())
