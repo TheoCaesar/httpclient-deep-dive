@@ -46,4 +46,15 @@ export class AvailablePlacesComponent implements OnInit {
 
     this.destroyRef.onDestroy(() => getPlaces.unsubscribe())
   }
+
+  addToFavourites(placeObj: Place){
+    const addSubscription = this.httpClient.put('http://localhost:3000/user-places', {
+      placeId: placeObj.id
+    }).subscribe({
+      next:(response)=>console.log(response),
+      error: (err)=> console.log(err),
+      complete:()=>console.log("complete")
+    })
+
+  }
 }
