@@ -19,6 +19,7 @@ export class AvailablePlacesComponent implements OnInit {
   destroyRef = inject(DestroyRef)
   // constructor(private httpClient: HttpClient){}
   isLoading = signal<boolean | undefined>(undefined);
+  isError = signal<any>(undefined);
 
   ngOnInit() {
     this.isLoading.set(true)
@@ -32,7 +33,11 @@ export class AvailablePlacesComponent implements OnInit {
           console.log(response)
           this.places.set(response)
         },
-        error: (err) => console.log('Eror', err),
+        error: (err) => {
+          console.log(err.name, err.message)
+          this.isError.set(`${err.statusText}`)
+          this.isLoading.set(undefined);
+        },
         complete: ()=> this.isLoading.update((loading)=> loading = false)
     })
 
