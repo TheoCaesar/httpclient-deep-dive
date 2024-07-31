@@ -15,8 +15,9 @@ import { PlacesService } from '../places.service';
   imports: [PlacesContainerComponent, PlacesComponent],
 })
 export class UserPlacesComponent implements OnInit {
-  places = signal<Place[] | undefined>(undefined);
   placeService = inject(PlacesService)
+  // places = signal<Place[] | undefined>(undefined);
+  places = this.placeService.loadedUserPlaces
   destroyRef = inject(DestroyRef)
   // constructor(private httpClient: HttpClient){}
   isLoading = signal<boolean | undefined>(undefined);
@@ -25,10 +26,10 @@ export class UserPlacesComponent implements OnInit {
   ngOnInit() {
     this.isLoading.set(true)
     const getPlaces = this.placeService.loadUserPlaces().subscribe({
-        next:(response)=>{ 
-          console.log(response)
-          this.places.set(response)
-        },
+        // next:(response)=>{ 
+        //   console.log(response)
+        //   this.places.set(response)
+        // },
         error: (err: Error) => {
           this.isError.set(`${err.message}`)
           this.isLoading.set(undefined);
