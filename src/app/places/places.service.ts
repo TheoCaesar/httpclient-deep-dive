@@ -44,10 +44,16 @@ export class PlacesService {
   }
 
   addPlaceToUserPlaces(place: Place) {
-    this.userPlaces.update((existingPlaces)=>[...existingPlaces, place])
+    const prevPlaces = this.userPlaces();
+    if(!prevPlaces.some((p)=>p.id === place.id)) this.userPlaces.update((existingPlaces)=>[...existingPlaces, place])
     return this.httpClient.put('http://localhost:3000/user-places', {
       placeId: place.id
-    })
+    }).pipe(
+      catchError((error)=>{
+        this.userPlaces.set(prevPlaces)
+        return throwError(()=>new Error("Failed to store selected place..."))
+      })
+    )
   }
 
   removeUserPlace(place: Place) {}
