@@ -40,4 +40,9 @@ export class UserPlacesComponent implements OnInit {
     this.destroyRef.onDestroy(() => getPlaces.unsubscribe())
   }
 
+  removeFromFavourites(place:Place){
+    this.placeService.removeUserPlace(place).subscribe({
+      
+    });
+  }
 }
