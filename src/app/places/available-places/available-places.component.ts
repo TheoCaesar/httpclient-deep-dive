@@ -5,6 +5,7 @@ import { PlacesComponent } from '../places.component';
 import { PlacesContainerComponent } from '../places-container/places-container.component';
 import { HttpClient } from '@angular/common/http';
 import { catchError, map, throwError } from 'rxjs';
+import { PlacesService } from '../places.service';
 
 @Component({
   selector: 'app-available-places',
@@ -15,7 +16,7 @@ import { catchError, map, throwError } from 'rxjs';
 })
 export class AvailablePlacesComponent implements OnInit {
   places = signal<Place[] | undefined>(undefined);
-  httpClient = inject(HttpClient)
+  placeService = inject(PlacesService)
   destroyRef = inject(DestroyRef)
   // constructor(private httpClient: HttpClient){}
   isLoading = signal<boolean | undefined>(undefined);
@@ -23,16 +24,7 @@ export class AvailablePlacesComponent implements OnInit {
 
   ngOnInit() {
     this.isLoading.set(true)
-    const getPlaces = this.httpClient.
-      get<{places: Place[]}>('http://localhost:3000/places', {
-        observe:'response' //or events as a value;
-      }).pipe(
-        map((data) => data.body?.places),
-        catchError((error_)=> {
-          console.log(error_)
-          return throwError(()=>new Error("Something went wrong! Please try again later..."))
-        })
-      ).subscribe({
+    const getPlaces = this.placeService.loadAvailablePlaces().subscribe({
         next:(response)=>{ 
           console.log(response)
           this.places.set(response)
@@ -48,13 +40,11 @@ export class AvailablePlacesComponent implements OnInit {
   }
 
   addToFavourites(placeObj: Place){
-    const addSubscription = this.httpClient.put('http://localhost:3000/user-places', {
-      placeId: placeObj.id
-    }).subscribe({
+    const subscription = this.placeService.addPlaceToUserPlaces(placeObj).subscribe({
       next:(response)=>console.log(response),
       error: (err)=> console.log(err),
       complete:()=>console.log("complete")
-    })
-
+    });
+    this.destroyRef.onDestroy(()=>subscription.unsubscribe());
   }
 }

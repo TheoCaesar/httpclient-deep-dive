@@ -5,6 +5,7 @@ import { PlacesComponent } from '../places.component';
 import { HttpClient } from '@angular/common/http';
 import { catchError, map, throwError } from 'rxjs';
 import { Place } from '../place.model';
+import { PlacesService } from '../places.service';
 
 @Component({
   selector: 'app-user-places',
@@ -15,7 +16,7 @@ import { Place } from '../place.model';
 })
 export class UserPlacesComponent implements OnInit {
   places = signal<Place[] | undefined>(undefined);
-  httpClient = inject(HttpClient)
+  placeService = inject(PlacesService)
   destroyRef = inject(DestroyRef)
   // constructor(private httpClient: HttpClient){}
   isLoading = signal<boolean | undefined>(undefined);
@@ -23,16 +24,7 @@ export class UserPlacesComponent implements OnInit {
 
   ngOnInit() {
     this.isLoading.set(true)
-    const getPlaces = this.httpClient.
-      get<{places: Place[]}>('http://localhost:3000/user-places', {
-        observe:'response' //or events as a value;
-      }).pipe(
-        map((data) => data.body?.places),
-        catchError((error_)=> {
-          console.log(error_)
-          return throwError(()=>new Error("Something went wrong! Please try again later..."))
-        })
-      ).subscribe({
+    const getPlaces = this.placeService.loadUserPlaces().subscribe({
         next:(response)=>{ 
           console.log(response)
           this.places.set(response)
